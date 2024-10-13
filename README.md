@@ -1,5 +1,5 @@
-# Goldman Sachs Hackathon
+# MCQ OMR sheet processor
 
-Code for the **[CS] OMR sheet processing** question.
+Inspired by the **[CS] OMR sheet processing** question in Goldman Sachs hackathon.
 
-Used Difference Of Hessians (DoH) with a constrained standard deviation to detect blobs/OMR answers with further heuristic constraints to detect only correctly filled circles.
+Used Determinant Of Hessians (DoH) with a constrained standard deviation to detect blobs/OMR answers with further heuristic constraints to detect only correctly filled circles.
