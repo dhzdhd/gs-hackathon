@@ -2,10 +2,18 @@ from PIL import Image, ImageDraw
 from random import randint
 from numpy import random as npr
 import pandas as pd
-
+import numpy as np
+import os
 
 template = Image.open("datasets/input/template.png")
 
+AMOUNT = 10000
+AMOUNT_STR = f"{AMOUNT // 1000}k"
+
+try:
+    os.mkdir(f"datasets/mcq{AMOUNT_STR}")
+except:
+    pass
 
 positions = {
     (1, 1): (35, 35, 65, 65),
@@ -26,12 +34,14 @@ positions = {
     (4, 4): (435, 435, 465, 465),
 }
 
-df = pd.DataFrame({"image": [], "answer": []})
+df = pd.DataFrame({"image": [], "1": [], "2": [], "3": [], "4": []})
 
 counter = 1
-while counter <= 100000:
+answers = []
+while counter <= AMOUNT:
     template_copy = template.copy()
     draw = ImageDraw.Draw(template_copy)
+    answer = []
 
     for i in range(1, 5):
         option = randint(1, 4)
@@ -42,11 +52,18 @@ while counter <= 100000:
 
         draw.pieslice(position, start=0, end=angle, fill="black", outline="black")
 
-        df = pd.concat(
-            [df, pd.DataFrame({"image": [counter], "answer": [[1, 2, 2, 3]]})]
-        )
+        is_valid = angle >= 270
+        answer.append(option if is_valid else None)
 
-    template_copy.save(f"datasets/mcq100k/{counter}.png")
+    answers.append(answer)
+    template_copy.save(f"datasets/mcq{AMOUNT_STR}/{counter}.png")
     counter += 1
 
-df.to_csv("datasets/mcq100k/mcq100k.csv")
+df["image"] = np.array(list(map(lambda x: f"{x}.png", range(1, AMOUNT + 1))))
+df["1"] = np.array(list(map(lambda x: x[0] if x[0] is not None else 0.0, answers)))
+df["2"] = np.array(list(map(lambda x: x[1] if x[1] is not None else 0.0, answers)))
+df["3"] = np.array(list(map(lambda x: x[2] if x[2] is not None else 0.0, answers)))
+df["4"] = np.array(list(map(lambda x: x[3] if x[3] is not None else 0.0, answers)))
+
+df.to_csv(f"datasets/mcq{AMOUNT_STR}/mcq{AMOUNT_STR}.csv", index=False)
+print(pd.read_csv(f"datasets/mcq{AMOUNT_STR}/mcq{AMOUNT_STR}.csv").head(10))
